@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">GreenWay</string>
+    <string name="web_client_id">1028549971358-8e0lgcpasr4br18ihbn3amll8d84ho5q.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">YOUR_APP_ID</string>
+
 </resources>
+
+<!-- Google Web Client ID for Firebase Authentication -->

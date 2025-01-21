@@ -13,9 +13,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -29,7 +26,6 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -63,9 +59,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.greenwayyyyyy))
+                .requestIdToken(getString(R.string.web_client_id))
+
                 .requestEmail()
                 .build();
+
         googleSignInClient = GoogleSignIn.getClient(this, gso);
 
         callbackManager = CallbackManager.Factory.create();
@@ -126,15 +124,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle Google Sign-In result
         if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                if (account != null) {
-                    firebaseAuthWithGoogle(account);
-                }
-            } catch (ApiException e) {
-                Toast.makeText(this, "Google Sign-In failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            GoogleSignIn.getSignedInAccountFromIntent(data)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            GoogleSignInAccount account = task.getResult();
+                            firebaseAuthWithGoogle(account);
+                        } else {
+                            Toast.makeText(MainActivity.this, "Google Sign-In failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
         }
 
         // Pass result to Facebook CallbackManager
