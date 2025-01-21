@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -18,6 +17,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -26,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
@@ -59,15 +60,17 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(getString(R.string.web_client_id))
-
+                .requestIdToken(getString(R.string.web_client_id))  // Web Client ID here
                 .requestEmail()
                 .build();
-
         googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Initialize Facebook SDK
+        FacebookSdk.sdkInitialize(getApplicationContext());
 
         callbackManager = CallbackManager.Factory.create();
 
+        // Firebase Email/Password authentication
         loginButton.setOnClickListener(v -> {
             String username = usernameEditText.getText().toString().trim();
             String password = passwordEditText.getText().toString().trim();
@@ -77,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // Firebase Email/Password authentication
             firebaseAuth.signInWithEmailAndPassword(username, password)
                     .addOnCompleteListener(MainActivity.this, task -> {
                         if (task.isSuccessful()) {
@@ -124,15 +126,15 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle Google Sign-In result
         if (requestCode == RC_SIGN_IN) {
-            GoogleSignIn.getSignedInAccountFromIntent(data)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            GoogleSignInAccount account = task.getResult();
-                            firebaseAuthWithGoogle(account);
-                        } else {
-                            Toast.makeText(MainActivity.this, "Google Sign-In failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
+            GoogleSignInAccount account = null;
+            try {
+                account = GoogleSignIn.getSignedInAccountFromIntent(data).getResult(ApiException.class);
+            } catch (ApiException e) {
+                throw new RuntimeException(e);
+            }
+            if (account != null) {
+                firebaseAuthWithGoogle(account);
+            }
         }
 
         // Pass result to Facebook CallbackManager
