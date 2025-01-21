@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1028549971358",
+    "project_id": "greenwayyyyyy",
+    "storage_bucket": "greenwayyyyyy.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1028549971358:android:66176dd1a3462a97e7da8f",
+        "android_client_info": {
+          "package_name": "com.example.greenway"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBSJ1x2lCRNsThonOq31LC8nf3UW9mGYVQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
