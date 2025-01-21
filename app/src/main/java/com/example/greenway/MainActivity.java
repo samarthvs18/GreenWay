@@ -85,11 +85,12 @@ public class MainActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             FirebaseUser user = firebaseAuth.getCurrentUser();
                             Toast.makeText(MainActivity.this, "Welcome, " + user.getEmail(), Toast.LENGTH_SHORT).show();
-                            goToHomePage();
+                            goToHomePage(); // Proceed to the Home page
                         } else {
                             Toast.makeText(MainActivity.this, "Login failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
+
         });
 
         // Set up Google login button click listener
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
         // Pass result to Facebook CallbackManager
         callbackManager.onActivityResult(requestCode, resultCode, data);
     }
@@ -153,6 +155,12 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Google Sign-In failed: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            // User is already signed in
+            goToHomePage();  // Directly navigate to Home page
+        }
+
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
@@ -168,6 +176,8 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
     }
+
+
 
     private void goToHomePage() {
         Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
